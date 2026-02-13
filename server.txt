@@ -1,0 +1,55 @@
+import { WebSocketServer, WebSocket } from "ws";
+
+const wss = new WebSocketServer({ port: 8080 });
+
+// 0: CONNECTING
+// 1: OPEN (THE ONLY STATE WHERE YOU CAN SAFELY SEND)
+// 2: CLOSING
+// 3: CLOSED
+
+//connection event
+wss.on("connection", (socket, request) => {
+  const ip = request.socket.remoteAddress;
+
+  socket.on("message", (rawData) => {
+    const message = rawData.toString();
+    console.log({ rawData });
+    wss.clients.forEach((client) => {
+      if (client.readyState === WebSocket.OPEN)
+        client.send(`Server Broadcast: ${message}`);
+    });
+  });
+  socket.on("error", (err) => {
+    console.error(`Error: ${err.message}: ${ip}`);
+  });
+  socket.on("close", () => console.log(`Client disconnected`));
+});
+
+console.log("Websocket Server is live on ws://localhost:8080");
+
+
+// Envelope
+
+// Types of message pattern
+// Broadcast (One to all) e.g (System announcements, global alerts, service status updates) Ocassionally
+// Unicast (One to one) e.g (Private messages, User notifications , Admin actions)
+//Multicast (One to many)  e.g (Discord channels, Game lobbies, Live event chats, Collaborative documents )
+
+// Acknowledgements (Acks) you send a message with an ID to server and server replies with same ID
+
+//Pub/Sub pattern (Only receive to what you care about)
+
+// Redis (Messgae broker)  
+
+// When should I use websocket and what kind of data should go through them
+//WebRTC (Voice, Video, P2P )
+// Chat, Notifications , Collaboration , Dashboards
+
+//Websockets for signalling + chat + join events
+//WebRTC for audio and video... Web Transport
+
+//Server Sent Events (Stock Prices, News Feed, Live Dashboards)
+
+ // Does the server needs to push updates // Yes // SSE Websockets
+ // Does the client needs to talk back // Websockets
+ // Is it heavy audio/video or huge data? // WebRTC
