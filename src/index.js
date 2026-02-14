@@ -2,7 +2,7 @@ import express from "express";
 import { config } from "dotenv";
 import { matchRouter } from "./routes/matches.js";
 import http from "http";
-import { attachWebSockerServer } from "./ws/server.js";
+import { attachWebSocketServer } from "./ws/server.js";
 
 config();
 
@@ -18,7 +18,7 @@ app.use("/matches", matchRouter);
 
 const server = http.createServer(app);
 
-const { broadcastMatchCreated } = attachWebSockerServer(server);
+const { broadcastMatchCreated } = attachWebSocketServer(server);
 app.locals.broadcastMatchCreated = broadcastMatchCreated;
 
 // ✅ IMPORTANT: listen on the HTTP server you attached ws to

@@ -13,20 +13,52 @@ function broadcast(wss, payload) {
   }
 }
 
-export function attachWebSockerServer(server) {
+export function attachWebSocketServer(server) {
   const wss = new WebSocketServer({
     server,
     path: "/ws",
     maxPayload: 1024 * 1024,
   });
 
-  wss.on("connection", (socket) => {
-    sendJson(socket, { type: "welcome" });
-    socket.on("error", console.error);
+  wss.on("connection", (ws) => {
+    ws.isAlive = true;
+
+    ws.on("pong", () => {
+      ws.isAlive = true;
+    });
+
+    sendJson(ws, { type: "welcome" });
+
+    ws.on("error", (err) => {
+      console.error("WS error:", err);
+    });
   });
+
+  const interval = setInterval(() => {
+    for (const ws of wss.clients) {
+      // if it's not open, skip (or terminate)
+      if (ws.readyState !== WebSocket.OPEN) continue;
+
+      if (ws.isAlive === false) {
+        ws.terminate();
+        continue;
+      }
+
+      ws.isAlive = false;
+
+      try {
+        ws.ping();
+      } catch {
+        ws.terminate();
+      }
+    }
+  }, 30_000);
+
+  wss.on("close", () => clearInterval(interval));
 
   function broadcastMatchCreated(match) {
     broadcast(wss, { type: "match_created", data: match });
   }
+
   return { broadcastMatchCreated };
 }
