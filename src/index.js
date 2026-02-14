@@ -6,7 +6,8 @@ import { attachWebSockerServer } from "./ws/server.js";
 
 config();
 
-const PORT = Number(process.env.PORT || 8080);
+const portEnv = Number.parseInt(process.env.PORT ?? "8080", 10);
+const PORT = Number.isFinite(portEnv) ? portEnv : 8080;
 const HOST = process.env.HOST || "0.0.0.0";
 
 const app = express();
