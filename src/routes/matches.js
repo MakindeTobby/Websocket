@@ -28,9 +28,21 @@ matchRouter.get("/", async (req, res) => {
       .limit(limit);
     res.json({ data });
   } catch (e) {
+    // return res.status(500).json({
+    //   error: "Failed to fetch match",
+    //   details: e?.message ?? String(e),
+    // });
+    console.error("DRIZZLE ERROR:", e);
+    console.error("CAUSE:", e?.cause); // important
     return res.status(500).json({
       error: "Failed to fetch match",
-      details: e?.message ?? String(e),
+      details: {
+        message: e?.message ?? String(e),
+        cause: e?.cause?.message,
+        code: e?.cause?.code ?? e?.code,
+        detail: e?.cause?.detail ?? e?.detail,
+        hint: e?.cause?.hint ?? e?.hint,
+      },
     });
   }
 });

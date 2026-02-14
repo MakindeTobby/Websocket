@@ -21,24 +21,28 @@ export function attachWebSocketServer(server) {
     maxPayload: 1024 * 1024,
   });
 
-  wss.on("connection", async (ws) => {
+  wss.on("connection", async (ws, req) => {
     if (wsArcjet) {
       try {
-        const decision = await httpArcjet.protect(req);
-        if (decision.isDenied) {
+        const decision = await wsArcjet.protect(req);
+
+        if (decision.isDenied()) {
           const code = decision.reason.isRateLimit() ? 1013 : 1008;
+
           const reason = decision.reason.isRateLimit()
             ? "Rate limit exceeded"
             : "Access denied";
+
           ws.close(code, reason);
           return;
         }
       } catch (e) {
-        console.error("WS connection error", e);
-        ws.close(1011, "Server security error");
+        console.error("WS security error:", e);
+        ws.close(1011, "Security error");
         return;
       }
     }
+
     ws.isAlive = true;
 
     ws.on("pong", () => {
@@ -47,9 +51,7 @@ export function attachWebSocketServer(server) {
 
     sendJson(ws, { type: "welcome" });
 
-    ws.on("error", (err) => {
-      console.error("WS error:", err);
-    });
+    ws.on("error", console.error);
   });
 
   const interval = setInterval(() => {
