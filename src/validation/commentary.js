@@ -17,8 +17,8 @@ export const createCommentarySchema = z.object({
   /**
    * Match minute (0, 1, 2, ..., 120)
    */
-  minute: z.coerce.number().int().min(0),
-
+  //   minute: z.coerce.number().int().min(0),
+  minute: z.coerce.number().int().min(0).max(120),
   /**
    * Sequence number for ordering events occurring in the same minute
    */

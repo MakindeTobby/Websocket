@@ -16,7 +16,7 @@ const app = express();
 app.use(express.json());
 
 app.get("/", (req, res) => res.send("hello from simple server :)"));
-app.use(securityMiddleware());
+// app.use(securityMiddleware());
 app.use("/matches", matchRouter);
 app.use("/matches/:id/commentary", commentaryRouter);
 
