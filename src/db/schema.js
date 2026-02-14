@@ -96,12 +96,15 @@ export const commentary = pgTable(
 
     message: text("message").notNull(),
 
-    metadata:
-      jsonb("metadata").$type?.(/* optional typing hook for TS users */ null) ??
-      jsonb("metadata"),
+    // metadata:
+    //   jsonb("metadata").$type?.(/* optional typing hook for TS users */ null) ??
+    //   jsonb("metadata"),
+
+    metadata: jsonb("metadata").notNull().default({}),
 
     // free-form tags, keep flexible for now
-    tags: text("tags"),
+    // tags: text("tags"),
+    tags: text("tags").array().notNull().default([]),
 
     createdAt: timestamp("created_at", { withTimezone: true })
       .notNull()
