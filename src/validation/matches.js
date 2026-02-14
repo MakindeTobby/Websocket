@@ -15,10 +15,14 @@ export const matchIdParamSchema = z.object({
   id: z.coerce.number().int().positive(),
 });
 
-const isoDateStringSchema = z.string().refine((value) => {
-  const t = Date.parse(value);
-  return Number.isFinite(t) && new Date(value).toISOString() === value;
-}, "Invalid ISO date string");
+// export const matchIdParamSchema = z.object({
+//   id: z.uuid(),
+// });
+
+// const isoDateStringSchema = z.string().refine((value) => {
+//   const t = Date.parse(value);
+//   return Number.isFinite(t) && new Date(value).toISOString() === value;
+// }, "Invalid ISO date string");
 
 export const createMatchSchema = z
   .object({

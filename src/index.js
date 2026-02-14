@@ -4,6 +4,7 @@ import { matchRouter } from "./routes/matches.js";
 import http from "http";
 import { attachWebSocketServer } from "./ws/server.js";
 import { securityMiddleware } from "./arcjet.js";
+import { commentaryRouter } from "./routes/commentary.js";
 
 config();
 
@@ -15,13 +16,16 @@ const app = express();
 app.use(express.json());
 
 app.get("/", (req, res) => res.send("hello from simple server :)"));
-app.use(securityMiddleware());
+// app.use(securityMiddleware());
 app.use("/matches", matchRouter);
+app.use("/matches/:id/commentary", commentaryRouter);
 
 const server = http.createServer(app);
 
-const { broadcastMatchCreated } = attachWebSocketServer(server);
+const { broadcastMatchCreated, broadcastCommentary } =
+  attachWebSocketServer(server);
 app.locals.broadcastMatchCreated = broadcastMatchCreated;
+app.locals.broadcastCommentary = broadcastCommentary;
 
 // ✅ IMPORTANT: listen on the HTTP server you attached ws to
 server.listen(PORT, HOST, () => {
